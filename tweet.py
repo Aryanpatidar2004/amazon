@@ -8,17 +8,19 @@ import time
 import pymongo
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
-username = "@rahul162239"
-password = "patidar@11990"
+
+username = input("input username :")
+password = input ("input password : ")
 
 PriceList=[]
+comment_set = {}
 browser = webdriver.Chrome()
 
 url="https://twitter.com/i/flow/login"
 
 
-# search_User = input("Search Product :")
-search_User = "virat kohli"
+search_User = input("Search Product :")
+
 browser.get(url)
 
 browser.implicitly_wait(30)
@@ -62,7 +64,7 @@ for _ in range(10):
         if len(PriceList) == 100:
             break
 
-    if len(PriceList) == 100:
+    if len(comment_set) == 100:
             break   
     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(random.uniform(1, 2)) 
@@ -84,13 +86,14 @@ print(f"Number of comments collected: {len(comment_set)}")
 
 print(PriceList)
    
-# Connect to MongoDB and insert data
+
 try:
     client = pymongo.MongoClient("mongodb://localhost:27017")
     db = client['amazon_data']
-    collection = db["Virat_kohli"]
-    collection.insert_many(PriceList)
-    print(f"Inserted {len(PriceList)} records into the collection virat kohli")
+    collection = db[search_User]
+    for i in comment_set:
+         collection.insert_one({"comments":  i})
+    print(f"Inserted {len(comment_set)} records into the collection {search_User}")
 except Exception as e:
     print("An error occurred while inserting data into MongoDB:", e)
 
